@@ -31,7 +31,11 @@ curl -X POST http://localhost:5000/api/users -H "Content-Type: application/json"
 ### Mettre à jour un utilisateur par ID (remplacez {userID} par l'ID réel) :
 curl -X PUT http://localhost:5000/api/users/{userID} -H "Content-Type: application/json" -d '{"nom": "Doe", "prenom": "John", "dateNaissance": "1990-01-01", "telephone": "+1234567890", "email": "john.doe@example.com"}'
 
-Supprimer un utilisateur par ID (remplacez {userID} par l'ID réel) :
+### Mettre à jour un role par ID (remplacez {userID} par l'ID réel) :
+curl -X PUT http://localhost:5000/users/{userID}/role -H 'Content-Type: application/json' -d '{"role": "admin"}'
+
+
+### Supprimer un utilisateur par ID (remplacez {userID} par l'ID réel) :
 
 curl -X DELETE http://localhost:5000/api/users/{userID}
 
