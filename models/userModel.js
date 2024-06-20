@@ -4,7 +4,8 @@ const userModel = {
     prenom: "",
     dateNaissance: null,
     telephone: "",
-    email:""
+    email:"",
+    role:""
 };
 
 module.exports = userModel;
