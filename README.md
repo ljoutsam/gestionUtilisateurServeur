@@ -16,6 +16,9 @@ Cette API permet de gérer les utilisateurs avec les opérations CRUD (Create, R
 
 Voici quelques exemples de requêtes cURL pour interagir avec l'API :
 
+### Login
+curl -X POST http://localhost:5000/api/login -H "Content-Type: application/json" -d '{"nom": "Admin", "email": "admin@test.com"}'
+
 ### Récupérer tous les utilisateurs
 
 curl -X GET http://localhost:5000/api/users
