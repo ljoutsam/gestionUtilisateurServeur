@@ -15,14 +15,22 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
+    const { nom, prenom, dateNaissance, telephone, email, role } = req.body;
+
+    // Vérifiez si l'email existe déjà
+    const existingUser = users.find(user => user.email === email);
+    if (existingUser) {
+        return res.status(409).send('Email already exists');
+    }
+
     const newUser = {
         id: users.length + 1,
-        nom: req.body.nom,
-        prenom: req.body.prenom,
-        dateNaissance: req.body.dateNaissance,
-        telephone: req.body.telephone,
-        email: req.body.email,
-        role: req.body.role || 'user'
+        nom,
+        prenom,
+        dateNaissance,
+        telephone,
+        email,
+        role: role || 'user' // Rôle par défaut 'user'
     };
     users.push(newUser);
     res.status(201).json(newUser);
@@ -36,14 +44,22 @@ const updateUser = (req, res) => {
         return res.status(404).send('User not found');
     }
 
+    const { nom, prenom, dateNaissance, telephone, email, role } = req.body;
+
+    // Vérifiez si l'email mis à jour existe déjà pour un autre utilisateur
+    const existingUser = users.find(user => user.email === email && user.id !== id);
+    if (existingUser) {
+        return res.status(409).send('Email already exists');
+    }
+
     const updatedUser = {
         ...users[index],
-        nom: req.body.nom,
-        prenom: req.body.prenom,
-        dateNaissance: req.body.dateNaissance,
-        telephone: req.body.telephone,
-        email: req.body.email,
-        role: req.body.role
+        nom,
+        prenom,
+        dateNaissance,
+        telephone,
+        email,
+        role
     };
     users[index] = updatedUser;
     res.status(200).json('User updated');
@@ -73,11 +89,67 @@ const deleteUser = (req, res) => {
     res.status(200).json('User deleted');
 };
 
+// Fonction pour trouver un utilisateur par email et nom
+const authenticateUser = (email, nom) => {
+    return users.find(user => user.email === email && user.nom === nom);
+};
+
+
+
+// Middleware pour vérifier l'authentification
+const isAuthenticated = (req, res, next) => {
+    const email = req.headers['email'];
+    const nom = req.headers['nom'];
+
+    if (!email || !nom) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const user = authenticateUser(email, nom);
+    if (user) {
+        req.user = user;
+        next();
+    } else {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+};
+
+const login = (req, res) => {
+    const { nom, email } = req.body;
+    console.log('Trying to login with:', nom, email);
+    const user = authenticateUser(email, nom);
+    console.log('Found user:', user);
+    if (user) {
+        res.status(200).json(user);
+    } else {
+        res.status(401).send('Invalid credentials');
+    }
+};
+
+
+// Fonction de logout
+const logout = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            res.clearCookie('sessionId'); 
+            res.status(200).send('Logged out successfully');
+        }
+    });
+};
+
+  
+
 module.exports = {
     getUsers,
     getUser,
     createUser,
     updateUser,
     deleteUser,
-    updateUserRole
+    updateUserRole,
+    login,
+    logout,
+    isAuthenticated
 };

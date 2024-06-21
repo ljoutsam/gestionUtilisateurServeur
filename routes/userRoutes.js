@@ -6,14 +6,23 @@ const {
     createUser,
     updateUser,
     deleteUser,
-    updateUserRole
+    updateUserRole,
+    isAuthenticated,
+    login,
+    logout
 } = require('../controllers/userController');
 
-router.get('/users', getUsers);
-router.get('/users/:userID', getUser);
-router.post('/users', createUser);
-router.put('/users/:userID', updateUser);
-router.delete('/users/:userID', deleteUser);
-router.put('/users/:userID/role', updateUserRole);
+// Route pour se connecter (login)
+router.post('/login', login);
+
+// Route pour se déconnecter (logout)
+router.post('/logout', logout);
+
+router.get('/users', isAuthenticated, getUsers);
+router.get('/users/:userID', isAuthenticated, getUser);
+router.post('/users', isAuthenticated, createUser);
+router.put('/users/:userID', isAuthenticated, updateUser);
+router.delete('/users/:userID', isAuthenticated, deleteUser);
+router.put('/users/:userID/role', isAuthenticated, updateUserRole);
 
 module.exports = router;
